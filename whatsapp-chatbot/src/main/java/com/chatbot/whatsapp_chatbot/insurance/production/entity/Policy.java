@@ -1,4 +1,4 @@
-package com.chatbot.whatsapp_chatbot.insurance.entity;
+package com.chatbot.whatsapp_chatbot.insurance.production.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

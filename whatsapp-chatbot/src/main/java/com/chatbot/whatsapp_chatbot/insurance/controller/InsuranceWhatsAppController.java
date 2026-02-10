@@ -1,4 +1,4 @@
-package com.chatbot.whatsapp_chatbot.insurance;
+package com.chatbot.whatsapp_chatbot.insurance.controller;
 
 
 import org.springframework.http.ResponseEntity;

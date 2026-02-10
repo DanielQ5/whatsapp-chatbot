@@ -1,6 +1,6 @@
-package com.chatbot.whatsapp_chatbot.insurance.repository;
+package com.chatbot.whatsapp_chatbot.insurance.production.repository;
 
-import com.chatbot.whatsapp_chatbot.insurance.entity.Policy;
+import com.chatbot.whatsapp_chatbot.insurance.production.entity.Policy;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,4 +1,5 @@
-package com.chatbot.whatsapp_chatbot.insurance.config;
+package com.chatbot.whatsapp_chatbot.insurance.production.config;
+
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -6,6 +7,7 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -16,32 +18,37 @@ import javax.sql.DataSource;
 @Configuration
 @EnableJpaRepositories(
         basePackages = "com.chatbot.whatsapp_chatbot.insurance.repository",  // Where is PolicyRepository?
-        entityManagerFactoryRef = "chatAnalyticsEntityManagerFactory",
-        transactionManagerRef = "chatAnalyticsTransactionManager"
+        entityManagerFactoryRef = "productionEntityManagerFactory",
+        transactionManagerRef = "productionTransactionManager"
 )
 
-public class ChatAnalyticsDataSourceConfig {
 
-    @Bean(name = "chatAnalyticsDataSource")
-    @ConfigurationProperties(prefix = "spring.datasource.chatanalytics")
-    public DataSource chatAnalyticsDataSource() {
+public class ProductionDataSourceConfig {
+
+    @Primary
+    @Bean(name = "productionDataSource")
+    @ConfigurationProperties(prefix = "spring.datasource.production")
+    public DataSource productionDataSource() {
         return DataSourceBuilder.create().build();
     }
 
-    @Bean(name = "chatAnalyticsEntityManagerFactory")
-    public LocalContainerEntityManagerFactoryBean chatAnalyticsEntityManagerFactory(
+    @Primary
+    @Bean(name = "productionEntityManagerFactory")
+    public LocalContainerEntityManagerFactoryBean productionEntityManagerFactory(
             EntityManagerFactoryBuilder builder,
-            @Qualifier("chatAnalyticsDataSource") DataSource dataSource) {
+            @Qualifier("productionDataSource") DataSource dataSource) {
         return builder
                 .dataSource(dataSource)
                 .packages("com.chatbot.whatsapp_chatbot.insurance.entity")  // Where is Policy entity?
-                .persistenceUnit("chatAnalytics")
+                .persistenceUnit("production")
                 .build();
     }
 
-    @Bean(name = "chatAnalyticsTransactionManager")
-    public PlatformTransactionManager chatAnalyticsTransactionManager(
-            @Qualifier("chatAnalyticsEntityManagerFactory") LocalContainerEntityManagerFactoryBean chatAnalyticsEntityManagerFactory) {
-        return new JpaTransactionManager(chatAnalyticsEntityManagerFactory.getObject());
+    @Primary
+    @Bean(name = "productionTransactionManager")
+    public PlatformTransactionManager productionTransactionManager(
+            @Qualifier("productionEntityManagerFactory") LocalContainerEntityManagerFactoryBean productionEntityManagerFactory) {
+        return new JpaTransactionManager(productionEntityManagerFactory.getObject());
     }
+
 }
