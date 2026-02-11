@@ -15,7 +15,7 @@ import javax.sql.DataSource;
 
 @Configuration
 @EnableJpaRepositories(
-        basePackages = "com.chatbot.whatsapp_chatbot.insurance.repository",  // Where is PolicyRepository?
+        basePackages = "com.chatbot.whatsapp_chatbot.insurance.chatanalytics.entity",  // Where is PolicyRepository?
         entityManagerFactoryRef = "chatAnalyticsEntityManagerFactory",
         transactionManagerRef = "chatAnalyticsTransactionManager"
 )
@@ -34,7 +34,7 @@ public class ChatAnalyticsDataSourceConfig {
             @Qualifier("chatAnalyticsDataSource") DataSource dataSource) {
         return builder
                 .dataSource(dataSource)
-                .packages("com.chatbot.whatsapp_chatbot.insurance.entity")  // Where is Policy entity?
+                .packages("com.chatbot.whatsapp_chatbot.insurance.chatanalytics.repository")  // Where is Policy entity?
                 .persistenceUnit("chatAnalytics")
                 .build();
     }
