@@ -21,5 +21,4 @@ public class UserSession {
     public void addAction(String action) {
         actionsTaken.add(action);
     }
-
 }

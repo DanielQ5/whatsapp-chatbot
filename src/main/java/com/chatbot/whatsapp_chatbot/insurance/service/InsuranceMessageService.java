@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class InsuranceMessageService {
@@ -18,6 +19,8 @@ public class InsuranceMessageService {
     private InteractionLogRepository interactionLogRepository;
 
     //TODO Insert Section 2
+    private Map<String, UserSession> activeSessions = new ConcurrentHashMap<>();
+
 
     private static final Map<String, String> MENU_TO_ACTION = Map.of(
             "1", "policy_type",
@@ -31,8 +34,32 @@ public class InsuranceMessageService {
     );
 
     public String processMessages(String phoneNumber, String messageContent) {
+        UserSession userSession = activeSessions.computeIfAbsent(phoneNumber, k -> new UserSession(phoneNumber));
+
+        String cleanMessage = messageContent.trim().toLowerCase();
 
         String response;
+
+       if (cleanMessage.equals("buenos dias") || cleanMessage.equals("hola")){
+           response = showWelcome();
+       }
+       else if (cleanMessage.equals("adios") || cleanMessage.equals("0")){
+           response=endConversation(userSession, phoneNumber);
+       }
+
+       else if (userSession.getPolicyNumber() != null && isMenuOption(messageContent.trim())){
+           response = handleMenuChoice(userSession, messageContent.trim());
+       }
+
+       else if (looksLikePolicyNumber(messageContent.trim().toUpperCase())){
+           response = registerPolicy(userSession, messageContent.trim().toUpperCase());
+       }
+
+       else {
+           response = "Lo sentimos, pero no logrammos entender lo que necesitas.\n\n" +
+                   "Favor ingresa 'hola' para dar inicio o\n" +
+                   "ingresa 'adios' para finalizar";
+       }
 
         return response;
     }
@@ -76,7 +103,7 @@ public class InsuranceMessageService {
         return "TODO: Implement handleMenuChoice";
     }
 
-    private String endConversation(UserSession session) {
+    private String endConversation(UserSession session, String phoneNumber) {
         // TODO:
         // 1. Save to database (call saveInteractionLog)
         // 2. Remove from activeSessions
