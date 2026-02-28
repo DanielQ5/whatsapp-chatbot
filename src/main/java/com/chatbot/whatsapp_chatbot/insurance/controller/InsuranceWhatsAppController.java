@@ -1,6 +1,8 @@
 package com.chatbot.whatsapp_chatbot.insurance.controller;
 
 
+import com.chatbot.whatsapp_chatbot.insurance.service.InsuranceMessageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,6 +12,9 @@ import java.util.Map;
 @RequestMapping("/webhook")
 
 public class InsuranceWhatsAppController {
+
+    @Autowired  // ← ADD THIS!
+    private InsuranceMessageService insuranceMessageService;  // ← ADD THIS!
 
     @PostMapping("/insurance")
     public ResponseEntity<String> receiveWhatsAppMessage(
@@ -26,9 +31,21 @@ public class InsuranceWhatsAppController {
         System.out.println("Sender: " + senderNumber);
         System.out.println("Receiver: " + recipientNumber);
 
-        String acknowledgementMessage = "Estamos cerca bebito fiu fiu!";
+        // Process message using the service!
+        String response = insuranceMessageService.processMessages(senderNumber, messageContent);
 
-        return ResponseEntity.ok(acknowledgementMessage);
+        System.out.println("Sending response: " + response);
+
+// Return TwiML format for Twilio
+        String twimlResponse =
+                "<Response>" +
+                        "  <Message>" + response + "</Message>" +
+                        "</Response>";
+
+        return ResponseEntity
+                .ok()
+                .header("Content-Type", "application/xml")
+                .body(twimlResponse);
     }
 
     @GetMapping("/test")

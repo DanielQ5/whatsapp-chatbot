@@ -1,12 +1,15 @@
 package com.chatbot.whatsapp_chatbot.insurance.service;
 
 
+import com.chatbot.whatsapp_chatbot.insurance.chatanalytics.entity.InteractionLog;
 import com.chatbot.whatsapp_chatbot.insurance.chatanalytics.repository.InteractionLogRepository;
 import com.chatbot.whatsapp_chatbot.insurance.production.entity.Policy;
 import com.chatbot.whatsapp_chatbot.insurance.production.repository.PolicyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -49,8 +52,8 @@ public class InsuranceMessageService {
             response = endConversation(userSession, phoneNumber);
         } else if (userSession.getPolicyNumber() != null && isMenuOption(messageContent.trim())) {
             response = handleMenuChoice(userSession, messageContent.trim());
-        } else if (looksLikePolicyNumber(messageContent.trim().toUpperCase())) {
-            response = registerPolicy(userSession, messageContent.trim().toUpperCase());
+        } else if (looksLikeNationalId(messageContent.trim())) {
+            response = registerPolicy(userSession, messageContent.trim());
         } else {
             response = "Lo sentimos, pero no logrammos entender lo que necesitas.\n\n" +
                     "Favor ingresa 'hola' para dar inicio o\n" +
@@ -62,28 +65,29 @@ public class InsuranceMessageService {
 
     private String showWelcome() {
         return "Gracias por contactarte con nuestra aseguradora! 👋\n\n" +
-                "Por favor brindanos tu numero de poliza.";
+                "Por favor brindanos tu No. de DUI, tal cual aparece en tu documento";
     }
 
-    private String registerPolicy(UserSession session, String policyNumber) {
+    private String registerPolicy(UserSession session, String nationalId) {
         // TODO:
         // 1. Query database: policyRepo.findByPolicyNumber(policyNumber)
-        Optional<Policy> policyOptional = policyRepository.findByPolicyNumber(policyNumber);
+        Optional<Policy> policyOptional = policyRepository.findByNationalId(nationalId);
 
         // 2. If policy not found, return error message
         if (policyOptional.isEmpty()) {
-            return "Póliza no encontrada: " + policyNumber + "\n\n" +
+            return "DUI no encontrado: " + nationalId + "\n\n" +
                     "Por favor verifica el número e intenta de nuevo.";
         }
 
-        // 3. If found, save to session: session.setPolicyNumber(policyNumber)
+        // Store policy number in session (for querying later)
         Policy policy = policyOptional.get();
-        session.setPolicyNumber(policyNumber);
+        session.setPolicyNumber(policy.getPolicyNumber());
 
 
         // 4. Return welcome message with showMenu()
 
-        return " Bienvenido: " + policy.getCustomerFirstName() + " " + policy.getCustomerLastName() + "\n\n" +
+        return " Bienvenido: " + policy.getCustomerFirstName() + " " + policy.getCustomerLastName() + "\n" +
+                "Póliza: " + policy.getPolicyNumber() + "\n\n" +
                 showMenu();
     }
 
@@ -156,7 +160,7 @@ public class InsuranceMessageService {
                 break;
 
             default:
-                response = "Opción inválida. Por favor elige 1-8.";
+                response = "Opción inválida. Por favor elige opcion entre 1-8.";
                 break;
         }
         // 5. Append showMenu() at the end
@@ -166,24 +170,37 @@ public class InsuranceMessageService {
     private String endConversation(UserSession session, String phoneNumber) {
         // TODO:
         // 1. Save to database (call saveInteractionLog)
+        saveInteractionLog(session);
         // 2. Remove from activeSessions
+        activeSessions.remove(phoneNumber);
         // 3. Return goodbye message
 
-        return "TODO: Implement endConversation";
+        return "Has finalizado la sesion, buen dia!";
     }
 
     private void saveInteractionLog(UserSession session) {
         // TODO:
         // 1. Create new InteractionLog object
+        InteractionLog interactionLog = new InteractionLog();
         // 2. Set all fields from session
+        interactionLog.setPhoneNumber(session.getPhoneNumber());
+        interactionLog.setPolicyNumber(session.getPolicyNumber());
+        interactionLog.setActionsTaken(session.getActionsTaken());
+        interactionLog.setSessionStartTime(session.getSessionStart());
+        interactionLog.setRequestedRepresentative(session.isRequestedRepresentative());
         // 3. Calculate duration
+        Duration interactionDuration = Duration.between(session.getSessionStart(), LocalDateTime.now());
+        interactionLog.setSessionDurationSeconds((int) interactionDuration.getSeconds());
+
+        LocalDateTime sessionEnd = LocalDateTime.now();
+        interactionLog.setSessionEndTime(sessionEnd);
         // 4. Save: logRepo.save(log)
+        interactionLogRepository.save(interactionLog);
     }
 
-    private boolean looksLikePolicyNumber(String text) {
-        // TODO: Check if text matches pattern: POL-12345
-        // Hint: text.matches("^POL-\\d{5}$")
-        return false;
+    private boolean looksLikeNationalId(String text) {
+        // El Salvador DUI format: 12345678-9 (8 digits, dash, 1 digit)
+        return text.matches("^\\d{8}-\\d$");
     }
 
     private boolean isMenuOption(String text) {

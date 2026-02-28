@@ -20,6 +20,9 @@ public class Policy {
     @Column(name = "policy_number")
     private String policyNumber;
 
+    @Column(name = "national_id")
+    private String nationalId;
+
     @Column(name = "customer_first_name")
     private String customerFirstName;
 

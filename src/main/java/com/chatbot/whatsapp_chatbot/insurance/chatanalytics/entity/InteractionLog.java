@@ -21,7 +21,7 @@ public class InteractionLog {
     private String policyNumber;
 
     @Column(name = "phone_number")
-    private Integer phoneNumber;
+    private String phoneNumber;
 
     @Column(name = "actions_taken", columnDefinition = "text[]")  // ← PostgreSQL array!
     private List<String> actionsTaken;
