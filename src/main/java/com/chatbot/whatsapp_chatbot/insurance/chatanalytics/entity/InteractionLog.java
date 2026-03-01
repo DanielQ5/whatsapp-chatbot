@@ -38,4 +38,69 @@ public class InteractionLog {
     @Column(name = "session_duration_seconds")
     private Integer sessionDurationSeconds;
 
+    // Manual getters/setters (Lombok not working)
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getPolicyNumber() {
+        return policyNumber;
+    }
+
+    public void setPolicyNumber(String policyNumber) {
+        this.policyNumber = policyNumber;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public List<String> getActionsTaken() {
+        return actionsTaken;
+    }
+
+    public void setActionsTaken(List<String> actionsTaken) {
+        this.actionsTaken = actionsTaken;
+    }
+
+    public Boolean getRequestedRepresentative() {
+        return requestedRepresentative;
+    }
+
+    public void setRequestedRepresentative(Boolean requestedRepresentative) {
+        this.requestedRepresentative = requestedRepresentative;
+    }
+
+    public LocalDateTime getSessionStartTime() {
+        return sessionStartTime;
+    }
+
+    public void setSessionStartTime(LocalDateTime sessionStartTime) {
+        this.sessionStartTime = sessionStartTime;
+    }
+
+    public LocalDateTime getSessionEndTime() {
+        return sessionEndTime;
+    }
+
+    public void setSessionEndTime(LocalDateTime sessionEndTime) {
+        this.sessionEndTime = sessionEndTime;
+    }
+
+    public Integer getSessionDurationSeconds() {
+        return sessionDurationSeconds;
+    }
+
+    public void setSessionDurationSeconds(Integer sessionDurationSeconds) {
+        this.sessionDurationSeconds = sessionDurationSeconds;
+    }
+
 }

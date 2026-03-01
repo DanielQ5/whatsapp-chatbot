@@ -21,4 +21,34 @@ public class UserSession {
     public void addAction(String action) {
         actionsTaken.add(action);
     }
+
+    // Manual getters/setters
+//    public String getPolicyNumber() {
+//        return policyNumber;
+//    }
+
+//    public void setPolicyNumber(String policyNumber) {
+//        this.policyNumber = policyNumber;
+//    }
+//
+//    public String getPhoneNumber() {
+//        return phoneNumber;
+//    }
+//
+//    public List<String> getActionsTaken() {
+//        return actionsTaken;
+//    }
+//
+//    public boolean isRequestedRepresentative() {
+//        return requestedRepresentative;
+//    }
+//
+//    public void setRequestedRepresentative(boolean requestedRepresentative) {
+//        this.requestedRepresentative = requestedRepresentative;
+//    }
+//
+//    public LocalDateTime getSessionStart() {
+//        return sessionStart;
+//    }
+
 }

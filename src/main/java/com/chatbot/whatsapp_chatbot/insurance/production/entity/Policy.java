@@ -62,4 +62,65 @@ public class Policy {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+//    // Manual getters (Lombok not processing correctly)
+//    public String getPolicyNumber() {
+//        return policyNumber;
+////    }
+//
+//    public String getCustomerFirstName() {
+//        return customerFirstName;
+//    }
+//
+//    public String getCustomerLastName() {
+//        return customerLastName;
+//    }
+//
+//    public Integer getCustomerPhone() {
+//        return customerPhone;
+//    }
+//
+//    public String getPolicyType() {
+//        return policyType;
+//    }
+//
+//    public BigDecimal getDeductible() {
+//        return deductible;
+//    }
+//
+//    public BigDecimal getMaxCoverage() {
+//        return maxCoverage;
+//    }
+//
+//    public String getCoveragePeriod() {
+//        return coveragePeriod;
+//    }
+//
+//    public LocalDate getEffectiveDate() {
+//        return effectiveDate;
+//    }
+//
+//    public LocalDate getExpirationDate() {
+//        return expirationDate;
+//    }
+//
+//    public BigDecimal getMonthlyPremium() {
+//        return monthlyPremium;
+//    }
+//
+//    public String getPaymentCycle() {
+//        return paymentCycle;
+//    }
+//
+//    public String getPolicyStatus() {
+//        return policyStatus;
+//    }
+//
+//    public LocalDateTime getCreatedAt() {
+//        return createdAt;
+//    }
+//
+//    public String getNationalId() {
+//        return nationalId;
+//    }
+
 }
