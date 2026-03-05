@@ -44,11 +44,6 @@ public class InsuranceMessageService {
 
         String cleanMessage = messageContent.trim().toLowerCase();
 
-        System.out.println("DEBUG - Session policy number: " + userSession.getPolicyNumber());
-        System.out.println("DEBUG - Original message: '" + messageContent + "'");
-        System.out.println("DEBUG - Trimmed message: '" + messageContent.trim() + "'");
-        System.out.println("DEBUG - isMenuOption result: " + isMenuOption(messageContent.trim()));
-
         String response;
 
         if (cleanMessage.equals("buenos dias") || cleanMessage.equals("hola")) {
