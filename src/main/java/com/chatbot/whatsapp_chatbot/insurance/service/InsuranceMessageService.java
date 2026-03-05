@@ -44,6 +44,11 @@ public class InsuranceMessageService {
 
         String cleanMessage = messageContent.trim().toLowerCase();
 
+        System.out.println("DEBUG - Session policy number: " + userSession.getPolicyNumber());
+        System.out.println("DEBUG - Original message: '" + messageContent + "'");
+        System.out.println("DEBUG - Trimmed message: '" + messageContent.trim() + "'");
+        System.out.println("DEBUG - isMenuOption result: " + isMenuOption(messageContent.trim()));
+
         String response;
 
         if (cleanMessage.equals("buenos dias") || cleanMessage.equals("hola")) {
@@ -55,7 +60,7 @@ public class InsuranceMessageService {
         } else if (looksLikeNationalId(messageContent.trim())) {
             response = registerPolicy(userSession, messageContent.trim());
         } else {
-            response = "Lo sentimos, pero no logrammos entender lo que necesitas.\n\n" +
+            response = "Lo sentimos, pero no logramos entender lo que necesitas.\n\n" +
                     "Favor ingresa 'hola' para dar inicio o\n" +
                     "ingresa 'adios' para finalizar";
         }
@@ -183,7 +188,8 @@ public class InsuranceMessageService {
         // 1. Create new InteractionLog object
         InteractionLog interactionLog = new InteractionLog();
         // 2. Set all fields from session
-        interactionLog.setPhoneNumber(session.getPhoneNumber());
+        String phoneNumber = session.getPhoneNumber().replace("whatsapp:", "");
+        interactionLog.setPhoneNumber(phoneNumber);
         interactionLog.setPolicyNumber(session.getPolicyNumber());
         interactionLog.setActionsTaken(session.getActionsTaken());
         interactionLog.setSessionStartTime(session.getSessionStart());
@@ -204,8 +210,6 @@ public class InsuranceMessageService {
     }
 
     private boolean isMenuOption(String text) {
-        // TODO: Check if text is 0-8
-        // Hint: text.matches("^[0-8]$")
-        return false;
+        return text.matches("^[0-8]$");
     }
 }
