@@ -69,7 +69,6 @@ public class InsuranceMessageService {
     }
 
     private String registerPolicy(UserSession session, String nationalId) {
-        // TODO:
         // 1. Query database: policyRepo.findByPolicyNumber(policyNumber)
         Optional<Policy> policyOptional = policyRepository.findByNationalId(nationalId);
 
@@ -81,8 +80,9 @@ public class InsuranceMessageService {
 
         // Store policy number in session (for querying later)
         Policy policy = policyOptional.get();
-        session.setPolicyNumber(policy.getPolicyNumber());
 
+        session.setPolicyNumber(policy.getPolicyNumber());
+        session.setPolicy(policy);
 
         // 4. Return welcome message with showMenu()
 
@@ -107,15 +107,8 @@ public class InsuranceMessageService {
     private String handleMenuChoice(UserSession session, String menuChoice) {
         // TODO:
         // 1. Get policy number from session
-        String policyBeingWorked = session.getPolicyNumber();
-        // 2. Query database: policyRepo.findByPolicyNumber(...)
-        Optional<Policy> policyOptional = policyRepository.findByPolicyNumber(policyBeingWorked);
+        Policy policyBeingWorked = session.getPolicy();
 
-        if (policyOptional.isEmpty()) {
-            return "Ocurrio un error al cargar la póliza. Por favor intenta de nuevo.";
-        }
-
-        Policy policy = policyOptional.get();
         // 3. Track action: session.addAction(MENU_TO_ACTION.get(choice))
         String trackAction = MENU_TO_ACTION.get(menuChoice);
         session.addAction(trackAction);
@@ -128,31 +121,31 @@ public class InsuranceMessageService {
 
         switch (menuChoice) {
             case "1": //Policy Type
-                response = "Tipo de poliza: " + policy.getPolicyType();
+                response = "Tipo de poliza: " + policyBeingWorked.getPolicyType();
                 break;
 
             case "2": //Deductible
-                response = "El Deducible es: " + "$" + policy.getDeductible();
+                response = "El Deducible es: " + "$" + policyBeingWorked.getDeductible();
                 break;
 
             case "3": //Max Coverage
-                response = "El Maximo a cubrir es de: " + "$" + policy.getMaxCoverage();
+                response = "El Maximo a cubrir es de: " + "$" + policyBeingWorked.getMaxCoverage();
                 break;
 
             case "4": //Coverage Start DAte
-                response = "La fecha efectiva de cobertura es: " + policy.getEffectiveDate();
+                response = "La fecha efectiva de cobertura es: " + policyBeingWorked.getEffectiveDate();
                 break;
 
             case "5": //Monthly Premium
-                response = "La cuota a cancelar es de: " + "$" + policy.getMonthlyPremium();
+                response = "La cuota a cancelar es de: " + "$" + policyBeingWorked.getMonthlyPremium();
                 break;
 
             case "6": //Payment Cycle
-                response = "La frecuencia de pago es: " + policy.getPaymentCycle();
+                response = "La frecuencia de pago es: " + policyBeingWorked.getPaymentCycle();
                 break;
 
             case "7": //Status
-                response = "La poliza se encuentra " + policy.getPolicyStatus() + " , con fecha de expiracion de: " + policy.getExpirationDate();
+                response = "La poliza se encuentra " + policyBeingWorked.getPolicyStatus() + " , con fecha de expiracion de: " + policyBeingWorked.getExpirationDate();
                 break;
 
             case "8": //Ask for a Representative
@@ -170,7 +163,11 @@ public class InsuranceMessageService {
     private String endConversation(UserSession session, String phoneNumber) {
         // TODO:
         // 1. Save to database (call saveInteractionLog)
-        saveInteractionLog(session);
+
+        if (session.getPolicyNumber() != null){
+            saveInteractionLog(session);
+        }
+
         // 2. Remove from activeSessions
         activeSessions.remove(phoneNumber);
         // 3. Return goodbye message
@@ -179,7 +176,6 @@ public class InsuranceMessageService {
     }
 
     private void saveInteractionLog(UserSession session) {
-        // TODO:
         // 1. Create new InteractionLog object
         InteractionLog interactionLog = new InteractionLog();
         // 2. Set all fields from session
