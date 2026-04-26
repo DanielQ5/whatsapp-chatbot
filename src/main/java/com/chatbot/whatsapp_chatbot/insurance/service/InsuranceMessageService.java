@@ -50,10 +50,10 @@ public class InsuranceMessageService {
             response = showWelcome();
         } else if (cleanMessage.equals("adios") || cleanMessage.equals("0")) {
             response = endConversation(userSession, phoneNumber);
-        } else if (userSession.getPolicyNumber() != null && isMenuOption(messageContent.trim())) {
-            response = handleMenuChoice(userSession, messageContent.trim());
-        } else if (looksLikeNationalId(messageContent.trim())) {
-            response = registerPolicy(userSession, messageContent.trim());
+        } else if (userSession.getPolicyNumber() != null && isMenuOption(cleanMessage)) {
+            response = handleMenuChoice(userSession, cleanMessage);
+        } else if (looksLikeNationalId(cleanMessage)) {
+            response = registerPolicy(userSession, cleanMessage);
         } else {
             response = "Lo sentimos, pero no logramos entender lo que necesitas.\n\n" +
                     "Favor ingresa 'hola' para dar inicio o\n" +
@@ -186,10 +186,12 @@ public class InsuranceMessageService {
         interactionLog.setSessionStartTime(session.getSessionStart());
         interactionLog.setRequestedRepresentative(session.isRequestedRepresentative());
         // 3. Calculate duration
-        Duration interactionDuration = Duration.between(session.getSessionStart(), LocalDateTime.now());
-        interactionLog.setSessionDurationSeconds((int) interactionDuration.getSeconds());
 
         LocalDateTime sessionEnd = LocalDateTime.now();
+        Duration interactionDuration = Duration.between(session.getSessionStart(), sessionEnd);
+        interactionLog.setSessionDurationSeconds((int) interactionDuration.getSeconds());
+
+
         interactionLog.setSessionEndTime(sessionEnd);
         // 4. Save: logRepo.save(log)
         interactionLogRepository.save(interactionLog);
@@ -201,6 +203,6 @@ public class InsuranceMessageService {
     }
 
     private boolean isMenuOption(String text) {
-        return text.matches("^[0-8]$");
+        return text.matches("^[1-8]$");
     }
 }
