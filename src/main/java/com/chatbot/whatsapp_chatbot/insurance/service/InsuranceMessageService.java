@@ -40,7 +40,9 @@ public class InsuranceMessageService {
     );
 
     public String processMessages(String phoneNumber, String messageContent) {
-        UserSession userSession = activeSessions.computeIfAbsent(phoneNumber, k -> new UserSession(phoneNumber));
+        String cleanPhone = phoneNumber.startsWith("whatsapp:") ? phoneNumber.substring("whatsapp:".length()) : phoneNumber;
+
+        UserSession userSession = activeSessions.computeIfAbsent(cleanPhone, k -> new UserSession(cleanPhone));
 
         String cleanMessage = messageContent.trim().toLowerCase();
 
@@ -49,7 +51,7 @@ public class InsuranceMessageService {
         if (cleanMessage.equals("buenos dias") || cleanMessage.equals("hola")) {
             response = showWelcome();
         } else if (cleanMessage.equals("adios") || cleanMessage.equals("0")) {
-            response = endConversation(userSession, phoneNumber);
+            response = endConversation(userSession, cleanPhone);
         } else if (userSession.getPolicyNumber() != null && isMenuOption(cleanMessage)) {
             response = handleMenuChoice(userSession, cleanMessage);
         } else if (looksLikeNationalId(cleanMessage)) {
@@ -164,7 +166,7 @@ public class InsuranceMessageService {
         // TODO:
         // 1. Save to database (call saveInteractionLog)
 
-        if (session.getPolicyNumber() != null){
+        if (session.getPolicyNumber() != null) {
             saveInteractionLog(session);
         }
 
@@ -179,8 +181,7 @@ public class InsuranceMessageService {
         // 1. Create new InteractionLog object
         InteractionLog interactionLog = new InteractionLog();
         // 2. Set all fields from session
-        String phoneNumber = session.getPhoneNumber().replace("whatsapp:", "");
-        interactionLog.setPhoneNumber(phoneNumber);
+        interactionLog.setPhoneNumber(session.getPhoneNumber());
         interactionLog.setPolicyNumber(session.getPolicyNumber());
         interactionLog.setActionsTaken(session.getActionsTaken());
         interactionLog.setSessionStartTime(session.getSessionStart());
