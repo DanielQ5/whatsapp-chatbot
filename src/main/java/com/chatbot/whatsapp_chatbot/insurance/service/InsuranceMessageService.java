@@ -1,8 +1,5 @@
 package com.chatbot.whatsapp_chatbot.insurance.service;
 
-
-import com.chatbot.whatsapp_chatbot.insurance.chatanalytics.entity.InteractionLog;
-import com.chatbot.whatsapp_chatbot.insurance.chatanalytics.repository.InteractionLogRepository;
 import com.chatbot.whatsapp_chatbot.insurance.production.entity.Policy;
 import com.chatbot.whatsapp_chatbot.insurance.production.repository.PolicyRepository;
 import org.springframework.stereotype.Service;
@@ -20,11 +17,11 @@ public class InsuranceMessageService {
 
     private final PolicyRepository policyRepository;
 
-    private final InteractionLogRepository interactionLogRepository;
+    private final InteractionLogService interactionLogService;
 
-    public InsuranceMessageService(PolicyRepository policyRepository, InteractionLogRepository interactionLogRepository) {
+    public InsuranceMessageService(PolicyRepository policyRepository, InteractionLogService interactionLogService) {
         this.policyRepository = policyRepository;
-        this.interactionLogRepository = interactionLogRepository;
+        this.interactionLogService = interactionLogService;
     }
 
     //TODO Insert Section 2
@@ -170,7 +167,7 @@ public class InsuranceMessageService {
         // 1. Save to database (call saveInteractionLog)
 
         if (session.getPolicyNumber() != null) {
-            saveInteractionLog(session);
+            interactionLogService.saveInteractionLog(session);
         }
 
         // 2. Remove from activeSessions
@@ -180,26 +177,6 @@ public class InsuranceMessageService {
         return "Has finalizado la sesion, buen dia!";
     }
 
-    private void saveInteractionLog(UserSession session) {
-        // 1. Create new InteractionLog object
-        InteractionLog interactionLog = new InteractionLog();
-        // 2. Set all fields from session
-        interactionLog.setPhoneNumber(session.getPhoneNumber());
-        interactionLog.setPolicyNumber(session.getPolicyNumber());
-        interactionLog.setActionsTaken(session.getActionsTaken());
-        interactionLog.setSessionStartTime(session.getSessionStart());
-        interactionLog.setRequestedRepresentative(session.isRequestedRepresentative());
-        // 3. Calculate duration
-
-        LocalDateTime sessionEnd = LocalDateTime.now();
-        Duration interactionDuration = Duration.between(session.getSessionStart(), sessionEnd);
-        interactionLog.setSessionDurationSeconds((int) interactionDuration.getSeconds());
-
-
-        interactionLog.setSessionEndTime(sessionEnd);
-        // 4. Save: logRepo.save(log)
-        interactionLogRepository.save(interactionLog);
-    }
 
     private boolean looksLikeNationalId(String text) {
         // El Salvador DUI format: 12345678-9 (8 digits, dash, 1 digit)
