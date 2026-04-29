@@ -1,11 +1,7 @@
 package com.chatbot.whatsapp_chatbot.insurance.service;
 
-
-import com.chatbot.whatsapp_chatbot.insurance.chatanalytics.entity.InteractionLog;
-import com.chatbot.whatsapp_chatbot.insurance.chatanalytics.repository.InteractionLogRepository;
 import com.chatbot.whatsapp_chatbot.insurance.production.entity.Policy;
 import com.chatbot.whatsapp_chatbot.insurance.production.repository.PolicyRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -18,14 +14,18 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class InsuranceMessageService {
 
-    @Autowired
-    private PolicyRepository policyRepository;
 
-    @Autowired
-    private InteractionLogRepository interactionLogRepository;
+    private final PolicyRepository policyRepository;
+
+    private final InteractionLogService interactionLogService;
+
+    public InsuranceMessageService(PolicyRepository policyRepository, InteractionLogService interactionLogService) {
+        this.policyRepository = policyRepository;
+        this.interactionLogService = interactionLogService;
+    }
 
     //TODO Insert Section 2
-    private Map<String, UserSession> activeSessions = new ConcurrentHashMap<>();
+    private final Map<String, UserSession> activeSessions = new ConcurrentHashMap<>();
 
 
     private static final Map<String, String> MENU_TO_ACTION = Map.of(
@@ -40,7 +40,9 @@ public class InsuranceMessageService {
     );
 
     public String processMessages(String phoneNumber, String messageContent) {
-        UserSession userSession = activeSessions.computeIfAbsent(phoneNumber, k -> new UserSession(phoneNumber));
+        String cleanPhone = phoneNumber.startsWith("whatsapp:") ? phoneNumber.substring("whatsapp:".length()) : phoneNumber;
+
+        UserSession userSession = activeSessions.computeIfAbsent(cleanPhone, k -> new UserSession(cleanPhone));
 
         String cleanMessage = messageContent.trim().toLowerCase();
 
@@ -49,7 +51,7 @@ public class InsuranceMessageService {
         if (cleanMessage.equals("buenos dias") || cleanMessage.equals("hola")) {
             response = showWelcome();
         } else if (cleanMessage.equals("adios") || cleanMessage.equals("0")) {
-            response = endConversation(userSession, phoneNumber);
+            response = endConversation(userSession, cleanPhone);
         } else if (userSession.getPolicyNumber() != null && isMenuOption(cleanMessage)) {
             response = handleMenuChoice(userSession, cleanMessage);
         } else if (looksLikeNationalId(cleanMessage)) {
@@ -164,8 +166,8 @@ public class InsuranceMessageService {
         // TODO:
         // 1. Save to database (call saveInteractionLog)
 
-        if (session.getPolicyNumber() != null){
-            saveInteractionLog(session);
+        if (session.getPolicyNumber() != null) {
+            interactionLogService.saveInteractionLog(session);
         }
 
         // 2. Remove from activeSessions
@@ -175,27 +177,6 @@ public class InsuranceMessageService {
         return "Has finalizado la sesion, buen dia!";
     }
 
-    private void saveInteractionLog(UserSession session) {
-        // 1. Create new InteractionLog object
-        InteractionLog interactionLog = new InteractionLog();
-        // 2. Set all fields from session
-        String phoneNumber = session.getPhoneNumber().replace("whatsapp:", "");
-        interactionLog.setPhoneNumber(phoneNumber);
-        interactionLog.setPolicyNumber(session.getPolicyNumber());
-        interactionLog.setActionsTaken(session.getActionsTaken());
-        interactionLog.setSessionStartTime(session.getSessionStart());
-        interactionLog.setRequestedRepresentative(session.isRequestedRepresentative());
-        // 3. Calculate duration
-
-        LocalDateTime sessionEnd = LocalDateTime.now();
-        Duration interactionDuration = Duration.between(session.getSessionStart(), sessionEnd);
-        interactionLog.setSessionDurationSeconds((int) interactionDuration.getSeconds());
-
-
-        interactionLog.setSessionEndTime(sessionEnd);
-        // 4. Save: logRepo.save(log)
-        interactionLogRepository.save(interactionLog);
-    }
 
     private boolean looksLikeNationalId(String text) {
         // El Salvador DUI format: 12345678-9 (8 digits, dash, 1 digit)
