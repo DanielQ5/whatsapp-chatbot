@@ -2,7 +2,6 @@ package com.chatbot.whatsapp_chatbot.insurance.controller;
 
 
 import com.chatbot.whatsapp_chatbot.insurance.service.InsuranceMessageService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,8 +12,12 @@ import java.util.Map;
 
 public class InsuranceWhatsAppController {
 
-    @Autowired  // ← ADD THIS!
-    private InsuranceMessageService insuranceMessageService;  // ← ADD THIS!
+
+    private final InsuranceMessageService insuranceMessageService;  // ← ADD THIS!
+
+    public InsuranceWhatsAppController(InsuranceMessageService insuranceMessageService) {
+        this.insuranceMessageService = insuranceMessageService;
+    }
 
     @PostMapping("/insurance")
     public ResponseEntity<String> receiveWhatsAppMessage(

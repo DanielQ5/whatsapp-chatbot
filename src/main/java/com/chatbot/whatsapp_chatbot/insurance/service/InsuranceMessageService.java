@@ -5,7 +5,6 @@ import com.chatbot.whatsapp_chatbot.insurance.chatanalytics.entity.InteractionLo
 import com.chatbot.whatsapp_chatbot.insurance.chatanalytics.repository.InteractionLogRepository;
 import com.chatbot.whatsapp_chatbot.insurance.production.entity.Policy;
 import com.chatbot.whatsapp_chatbot.insurance.production.repository.PolicyRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -18,11 +17,15 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class InsuranceMessageService {
 
-    @Autowired
-    private PolicyRepository policyRepository;
 
-    @Autowired
-    private InteractionLogRepository interactionLogRepository;
+    private final PolicyRepository policyRepository;
+
+    private final InteractionLogRepository interactionLogRepository;
+
+    public InsuranceMessageService(PolicyRepository policyRepository, InteractionLogRepository interactionLogRepository) {
+        this.policyRepository = policyRepository;
+        this.interactionLogRepository = interactionLogRepository;
+    }
 
     //TODO Insert Section 2
     private final Map<String, UserSession> activeSessions = new ConcurrentHashMap<>();
