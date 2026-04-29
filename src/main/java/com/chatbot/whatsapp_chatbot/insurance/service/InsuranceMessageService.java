@@ -25,7 +25,7 @@ public class InsuranceMessageService {
     private InteractionLogRepository interactionLogRepository;
 
     //TODO Insert Section 2
-    private Map<String, UserSession> activeSessions = new ConcurrentHashMap<>();
+    private final Map<String, UserSession> activeSessions = new ConcurrentHashMap<>();
 
 
     private static final Map<String, String> MENU_TO_ACTION = Map.of(
