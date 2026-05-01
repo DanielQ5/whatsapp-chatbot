@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 @Service
 public class InsuranceMessageService {
@@ -38,6 +39,17 @@ public class InsuranceMessageService {
             "7", "claim_format",
             "8", "speak_to_representative"
     );
+
+    private static final Map<String, Function<Policy, String>> MENU_HANDLERS = Map.of(
+            "1", policy -> "Tipo de Poliza: " + policy.getPolicyType(),
+            "2", policy -> "El Deducible es: $" + policy.getDeductible(),
+            "3", policy -> "El Maximo a cubrir es de: $" + policy.getMaxCoverage(),
+            "4", policy -> "La fecha efectiva de cobertura es: " + policy.getEffectiveDate(),
+            "5", policy -> "La cuota a cancelar es de: $" + policy.getMonthlyPremium(),
+            "6", policy -> "La frecuencia de pago es: " + policy.getPaymentCycle(),
+            "7", policy -> "La poliza se encuentra " + policy.getPolicyStatus() + " , con fecha de expiracion de: " + policy.getExpirationDate(),
+            "8", policy -> "Conectandote con un ejecutivo en estos momentos..."
+            );
 
     public String processMessages(String phoneNumber, String messageContent) {
         String cleanPhone = phoneNumber.startsWith("whatsapp:") ? phoneNumber.substring("whatsapp:".length()) : phoneNumber;
@@ -107,7 +119,7 @@ public class InsuranceMessageService {
     }
 
     private String handleMenuChoice(UserSession session, String menuChoice) {
-        // TODO:
+
         // 1. Get policy number from session
         Policy policyBeingWorked = session.getPolicy();
 
@@ -119,45 +131,10 @@ public class InsuranceMessageService {
             session.setRequestedRepresentative(true);
         }
         // 4. Use switch/if-else to return appropriate response
-        String response;
 
-        switch (menuChoice) {
-            case "1": //Policy Type
-                response = "Tipo de poliza: " + policyBeingWorked.getPolicyType();
-                break;
+        String response = MENU_HANDLERS.get(menuChoice).apply(policyBeingWorked);
 
-            case "2": //Deductible
-                response = "El Deducible es: " + "$" + policyBeingWorked.getDeductible();
-                break;
 
-            case "3": //Max Coverage
-                response = "El Maximo a cubrir es de: " + "$" + policyBeingWorked.getMaxCoverage();
-                break;
-
-            case "4": //Coverage Start DAte
-                response = "La fecha efectiva de cobertura es: " + policyBeingWorked.getEffectiveDate();
-                break;
-
-            case "5": //Monthly Premium
-                response = "La cuota a cancelar es de: " + "$" + policyBeingWorked.getMonthlyPremium();
-                break;
-
-            case "6": //Payment Cycle
-                response = "La frecuencia de pago es: " + policyBeingWorked.getPaymentCycle();
-                break;
-
-            case "7": //Status
-                response = "La poliza se encuentra " + policyBeingWorked.getPolicyStatus() + " , con fecha de expiracion de: " + policyBeingWorked.getExpirationDate();
-                break;
-
-            case "8": //Ask for a Representative
-                response = "Conectandote con un ejecutivo en estos momentos...";
-                break;
-
-            default:
-                response = "Opción inválida. Por favor elige opcion entre 1-8.";
-                break;
-        }
         // 5. Append showMenu() at the end
         return response + "\n\n" + showMenu();
     }
