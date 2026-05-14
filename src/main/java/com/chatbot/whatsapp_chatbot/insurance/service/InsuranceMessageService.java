@@ -2,6 +2,8 @@ package com.chatbot.whatsapp_chatbot.insurance.service;
 
 import com.chatbot.whatsapp_chatbot.insurance.production.entity.Policy;
 import com.chatbot.whatsapp_chatbot.insurance.production.repository.PolicyRepository;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -49,12 +51,14 @@ public class InsuranceMessageService {
             "6", policy -> "La frecuencia de pago es: " + policy.getPaymentCycle(),
             "7", policy -> "La poliza se encuentra " + policy.getPolicyStatus() + " , con fecha de expiracion de: " + policy.getExpirationDate(),
             "8", policy -> "Conectandote con un ejecutivo en estos momentos..."
-            );
+    );
 
     public String processMessages(String phoneNumber, String messageContent) {
         String cleanPhone = phoneNumber.startsWith("whatsapp:") ? phoneNumber.substring("whatsapp:".length()) : phoneNumber;
 
         UserSession userSession = activeSessions.computeIfAbsent(cleanPhone, k -> new UserSession(cleanPhone));
+
+        userSession.setLastInteractionTime(LocalDateTime.now());
 
         String cleanMessage = messageContent.trim().toLowerCase();
 
@@ -162,5 +166,11 @@ public class InsuranceMessageService {
 
     private boolean isMenuOption(String text) {
         return text.matches("^[1-8]$");
+    }
+
+    @Scheduled(fixedRate = 60000)
+    private void cleanUpSessions() {
+        activeSessions.entrySet().removeIf(entry -> entry.getValue().getLastInteractionTime().isBefore(LocalDateTime.now().minusMinutes(30)));
+
     }
 }
