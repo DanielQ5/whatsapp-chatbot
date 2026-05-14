@@ -15,6 +15,7 @@ public class UserSession {
     private boolean requestedRepresentative = false;
     private LocalDateTime sessionStart = LocalDateTime.now();
     private Policy policy;
+    private LocalDateTime lastInteractionTime = LocalDateTime.now();
 
     public UserSession(String phoneNumber) {
         this.phoneNumber = phoneNumber;
