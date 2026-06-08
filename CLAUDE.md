@@ -33,6 +33,7 @@ All secrets are stored in `.env` (never committed). Required variables:
 | `PROD_DB_PASSWORD` | Production PostgreSQL datasource |
 | `ANALYTICS_DB_PASSWORD` | Chat analytics PostgreSQL datasource |
 | `WEATHER_API_KEY` | WeatherAPI.com via `WeatherService` |
+| `GEMINI_API_KEY` | Google Gemini LLM via `GeminiService` |
 
 Spring resolves these automatically via `${VAR_NAME}` placeholders in `application.properties`.
 
@@ -82,6 +83,7 @@ Session lifecycle:
 | `Policy` | JPA entity mapping `policies` table in production DB |
 | `InteractionLog` | JPA entity mapping `insurance_chatanalytics` table |
 | `WeatherService` | Standalone service calling weatherapi.com (Gson for JSON parsing) |
+| `GeminiService` | Standalone service calling Google Gemini LLM via REST API |
 
 ### Lombok
 
