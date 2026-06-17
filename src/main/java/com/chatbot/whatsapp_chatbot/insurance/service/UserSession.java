@@ -6,6 +6,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class UserSession {
@@ -16,6 +17,7 @@ public class UserSession {
     private LocalDateTime sessionStart = LocalDateTime.now();
     private Policy policy;
     private LocalDateTime lastInteractionTime = LocalDateTime.now();
+    private List<Map<String, String>> conversationHistory = new ArrayList<>();
 
     public UserSession(String phoneNumber) {
         this.phoneNumber = phoneNumber;

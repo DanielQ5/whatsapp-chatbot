@@ -39,6 +39,4 @@ public class GeminiService {
         return response.getBody(); // raw JSON response for now
 
     }
-
-
 }
