@@ -19,12 +19,13 @@ public class InsuranceMessageService {
 
 
     private final PolicyRepository policyRepository;
-
+    private final GeminiIntentDetectionService geminiIntentDetectionService;
     private final InteractionLogService interactionLogService;
 
-    public InsuranceMessageService(PolicyRepository policyRepository, InteractionLogService interactionLogService) {
+    public InsuranceMessageService(PolicyRepository policyRepository, InteractionLogService interactionLogService, GeminiIntentDetectionService geminiIntentDetectionService) {
         this.policyRepository = policyRepository;
         this.interactionLogService = interactionLogService;
+        this.geminiIntentDetectionService = geminiIntentDetectionService;
     }
 
     //TODO Insert Section 2
@@ -72,6 +73,8 @@ public class InsuranceMessageService {
             response = handleMenuChoice(userSession, cleanMessage);
         } else if (looksLikeNationalId(cleanMessage)) {
             response = registerPolicy(userSession, cleanMessage);
+        } else if (userSession.getPolicyNumber() != null) {
+            response = handleFreeText(userSession, cleanMessage);
         } else {
             response = "Lo sentimos, pero no logramos entender lo que necesitas.\n\n" +
                     "Favor ingresa 'hola' para dar inicio o\n" +
@@ -141,6 +144,16 @@ public class InsuranceMessageService {
 
         // 5. Append showMenu() at the end
         return response + "\n\n" + showMenu();
+    }
+
+    private String handleFreeText(UserSession session, String message) {
+        int intent = geminiIntentDetectionService.detectIntent(session.getConversationHistory(), message);
+
+        if (intent >= 1 && intent <= 8) {
+            return handleMenuChoice(session, String.valueOf(intent));
+        }
+
+        return "No logré identificar tu solicitud. ¿Podrías ser más específico?\n\n" + showMenu();
     }
 
     private String endConversation(UserSession session, String phoneNumber) {

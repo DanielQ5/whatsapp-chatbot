@@ -37,7 +37,10 @@ public class GeminiIntentDetectionService {
                 .getAsJsonObject().get("content")
                 .getAsJsonObject().get("parts").getAsJsonArray().get(0)
                 .getAsJsonObject().get("text").getAsString();
-        return Integer.parseInt(text.trim());
+        try {
+            return Integer.parseInt(text.trim());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
-
 }
