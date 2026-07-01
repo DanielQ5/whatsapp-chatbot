@@ -81,6 +81,9 @@ public class InsuranceMessageService {
                     "ingresa 'adios' para finalizar";
         }
 
+        userSession.getConversationHistory().add(Map.of("role", "user", "content", cleanMessage));
+        userSession.getConversationHistory().add(Map.of("role", "model", "content", response));
+
         return response;
     }
 

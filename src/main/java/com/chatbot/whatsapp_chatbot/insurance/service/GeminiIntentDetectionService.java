@@ -17,6 +17,17 @@ public class GeminiIntentDetectionService {
     }
 
     public int detectIntent(List<Map<String, String>> conversationHistory, String content) {
+        List<Map<String, String>> recentHistory = conversationHistory.subList(
+                Math.max(0, conversationHistory.size() - 6),
+                conversationHistory.size()
+        );
+
+        StringBuilder historyText = new StringBuilder();
+        for (Map<String, String> entry : recentHistory) {
+            String role = entry.get("role").equals("user") ? "Usuario" : "Asistente";
+            historyText.append(role).append(": ").append(entry.get("content")).append("\n");
+        }
+
         String prompt = "Tienes estas opciones de menu:\n" +
                 "1 = tipo de poliza\n" +
                 "2 = deducible\n" +
@@ -26,6 +37,7 @@ public class GeminiIntentDetectionService {
                 "6 = frecuencia de pago\n" +
                 "7 = estado y expiracion de poliza\n" +
                 "8 = hablar con un ejecutivo\n\n" +
+                (historyText.length() > 0 ? "Conversacion previa:\n" + historyText + "\n" : "") +
                 "Mensaje del usuario: " + content + "\n\n" +
                 "Responde SOLO con el numero de la opcion que mejor corresponda al mensaje. " +
                 "Si el mensaje no corresponde a ninguna opcion, responde con 0.";
