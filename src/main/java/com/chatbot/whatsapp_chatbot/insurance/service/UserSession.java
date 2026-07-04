@@ -1,6 +1,5 @@
 package com.chatbot.whatsapp_chatbot.insurance.service;
 
-import com.chatbot.whatsapp_chatbot.insurance.production.entity.Policy;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -16,7 +15,6 @@ public class UserSession {
     private List<String> actionsTaken = new ArrayList<>();
     private boolean requestedRepresentative = false;
     private LocalDateTime sessionStart = LocalDateTime.now();
-    private Policy policy;
     private LocalDateTime lastInteractionTime = LocalDateTime.now();
     private List<Map<String, String>> conversationHistory = new CopyOnWriteArrayList<>();
 

@@ -81,7 +81,6 @@ public class InsuranceMessageService {
         Policy policy = policyOptional.get();
 
         session.setPolicyNumber(policy.getPolicyNumber());
-        session.setPolicy(policy);
 
         return " Bienvenido: " + policy.getCustomerFirstName() + " " + policy.getCustomerLastName() + "\n" +
                 "Póliza: " + policy.getPolicyNumber() + "\n\n" +
