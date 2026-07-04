@@ -14,15 +14,19 @@ import java.util.Map;
 @Service
 public class GeminiService {
 
+    private final RestTemplate restTemplate;
+
     @Value("${gemini.api.key}")
     private String apiKey;
 
     @Value("${gemini.api.url}")
     private String apiUrl;
 
-    public String inquiry(String prompt) {
-        RestTemplate restTemplate = new RestTemplate();
+    public GeminiService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
+    public String inquiry(String prompt) {
         Map<String, Object> part = Map.of("text", prompt);
         Map<String, Object> content = Map.of("parts", List.of(part));
         Map<String, Object> body = Map.of("contents", List.of(content));
