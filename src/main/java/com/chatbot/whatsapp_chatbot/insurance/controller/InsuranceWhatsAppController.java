@@ -2,6 +2,9 @@ package com.chatbot.whatsapp_chatbot.insurance.controller;
 
 
 import com.chatbot.whatsapp_chatbot.insurance.service.InsuranceMessageService;
+import com.chatbot.whatsapp_chatbot.insurance.service.TwilioSignatureValidator;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,16 +15,27 @@ import java.util.Map;
 
 public class InsuranceWhatsAppController {
 
+    private final InsuranceMessageService insuranceMessageService;
+    private final TwilioSignatureValidator twilioSignatureValidator;
 
-    private final InsuranceMessageService insuranceMessageService;  // ← ADD THIS!
-
-    public InsuranceWhatsAppController(InsuranceMessageService insuranceMessageService) {
+    public InsuranceWhatsAppController(InsuranceMessageService insuranceMessageService,
+                                        TwilioSignatureValidator twilioSignatureValidator) {
         this.insuranceMessageService = insuranceMessageService;
+        this.twilioSignatureValidator = twilioSignatureValidator;
     }
 
     @PostMapping("/insurance")
     public ResponseEntity<String> receiveWhatsAppMessage(
-            @RequestParam Map<String, String> payload) {
+            @RequestParam Map<String, String> payload,
+            @RequestHeader(value = "X-Twilio-Signature", required = false) String twilioSignature,
+            HttpServletRequest request) {
+
+        String requestUrl = request.getRequestURL().toString();
+
+        if (!twilioSignatureValidator.isValid(requestUrl, payload, twilioSignature)) {
+            System.out.println("Rejected webhook request with invalid Twilio signature");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
 
         System.out.println("Message, Received");
         System.out.println("Full Payload: " + payload);

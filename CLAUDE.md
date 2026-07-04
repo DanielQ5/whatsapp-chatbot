@@ -34,6 +34,7 @@ All secrets are stored in `.env` (never committed). Required variables:
 | `ANALYTICS_DB_PASSWORD` | Chat analytics PostgreSQL datasource |
 | `WEATHER_API_KEY` | WeatherAPI.com via `WeatherService` |
 | `GEMINI_API_KEY` | Google Gemini LLM via `GeminiService` |
+| `TWILIO_AUTH_TOKEN` | Validates the `X-Twilio-Signature` header on `/webhook/insurance` via `TwilioSignatureValidator` |
 
 Spring resolves these automatically via `${VAR_NAME}` placeholders in `application.properties`.
 
