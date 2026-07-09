@@ -84,7 +84,7 @@ public class InsuranceMessageService {
 
         return " Bienvenido: " + policy.getCustomerFirstName() + " " + policy.getCustomerLastName() + "\n" +
                 "Póliza: " + policy.getPolicyNumber() + "\n\n" +
-                showMenu();
+                "¿En qué puedo ayudarte?";
     }
 
     private String showMenu() {
@@ -116,7 +116,7 @@ public class InsuranceMessageService {
 
         String response = option.respond(policyBeingWorked);
 
-        return response + "\n\n" + showMenu();
+        return response + "\n\n¿Necesitas algo más?";
     }
 
     private String handleFreeText(UserSession session, String message) {
