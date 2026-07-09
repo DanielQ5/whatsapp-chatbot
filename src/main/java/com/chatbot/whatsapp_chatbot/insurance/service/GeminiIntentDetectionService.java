@@ -2,6 +2,8 @@ package com.chatbot.whatsapp_chatbot.insurance.service;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,6 +11,8 @@ import java.util.Map;
 
 @Service
 public class GeminiIntentDetectionService {
+
+    private static final Logger logger = LoggerFactory.getLogger(GeminiIntentDetectionService.class);
 
     private final GeminiService geminiService;
 
@@ -52,6 +56,7 @@ public class GeminiIntentDetectionService {
 
             return Integer.parseInt(text.trim());
         } catch (Exception e) {
+            logger.error("Failed to detect intent from Gemini response", e);
             return 0;
         }
     }
