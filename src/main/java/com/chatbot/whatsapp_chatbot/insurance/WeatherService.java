@@ -1,5 +1,7 @@
 package com.chatbot.whatsapp_chatbot.insurance;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -12,16 +14,22 @@ import com.google.gson.JsonObject;
 @Service
 public class WeatherService {
 
+    private static final Logger logger = LoggerFactory.getLogger(WeatherService.class);
+
+    private final RestTemplate restTemplate;
+
     @Value("${weather.api.key}")
     private String apiKey;
     private static final String BASE_URL = "https://api.weatherapi.com/v1/current.json";
 
     private final Gson gson = new Gson();
 
+    public WeatherService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
     public String getWeather(String city) {
         try {
-            RestTemplate restTemplate = new RestTemplate();
-
             String url = UriComponentsBuilder
                     .fromHttpUrl(BASE_URL)
                     .queryParam("key", apiKey)
@@ -29,23 +37,21 @@ public class WeatherService {
                     .queryParam("aqi", "no")
                     .toUriString();
 
-            System.out.println("Making HTTP GET call to: " + url);
+            logger.debug("Making HTTP GET call for city: {}", city);
 
             String jsonResponse = restTemplate.getForObject(url, String.class);
 
-            System.out.println("Response received:" + jsonResponse);
+            logger.debug("Weather response received for city: {}", city);
 
             return parseWeatherResponseWithGson(jsonResponse, city);
 
         } catch (HttpClientErrorException e) {
-            System.err.println("HTTP Error: " + e.getStatusCode());
-            System.err.println("Error Message: " + e.getMessage());
-            return "Error: Could not fetch weather. " + e.getMessage();
-
+            logger.error("HTTP error fetching weather for city {}: {}", city, e.getStatusCode());
+            return "No se pudo obtener el clima en este momento. Intenta de nuevo mas tarde.";
 
         } catch (Exception e) {
-            System.err.println("Error fetching weather: " + e.getMessage());
-            return "Error " + e.getMessage();
+            logger.error("Error fetching weather for city {}", city, e);
+            return "No se pudo obtener el clima en este momento. Intenta de nuevo mas tarde.";
         }
     }
 
@@ -78,8 +84,8 @@ public class WeatherService {
             );
 
         } catch (Exception e) {
-            System.err.println("Error parsing JSON: " + e.getMessage());
-            return "Error: Could not parse weather data. " + e.getMessage();
+            logger.error("Error parsing weather JSON for city {}", city, e);
+            return "No se pudo procesar la informacion del clima.";
         }
     }
 }
